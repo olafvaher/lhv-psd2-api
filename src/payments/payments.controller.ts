@@ -1,25 +1,15 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UsePipes } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
+import { JoiValidationPipe } from '../pipes/validation.pipe';
+import { Payment, paymentSchema } from './initiatePayment.model';
 
 @Controller('payments')
 export class PaymentsController {
   constructor(private readonly paymentsService: PaymentsService) {}
 
   @Post('initiate')
-  initiatePayment(
-    @Body('debtorAccount') debtorAccount: string,
-    @Body('creditorAccount') creditorAccount: string,
-    @Body('creditorName') creditorName: string,
-    @Body('amount') amount: number,
-    @Body('description') description: string,
-  ) {
-    const payment = {
-      debtorAccount,
-      creditorAccount,
-      creditorName,
-      amount,
-      description,
-    };
+  @UsePipes(new JoiValidationPipe(paymentSchema))
+  initiatePayment(@Body() payment: Payment) {
     return this.paymentsService.initiatePayment(payment);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { lhvApiUrl } from '../constants';
 import got from 'got';
 import * as fs from 'fs';
@@ -48,6 +48,9 @@ export class PaymentsService {
       return body;
     } catch (error) {
       console.log(error.response.body);
+      if (error.response.statusCode === 400) {
+        throw new BadRequestException(error.response.body);
+      }
       throw error;
     }
   }
